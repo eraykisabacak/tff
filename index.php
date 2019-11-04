@@ -1,16 +1,12 @@
 <?php
+require_once('baglan.php');
 
-$host = "localhost";
-$user = "root";
-$password = "12345678";
-$db = "tffdb";
-
-$conn = mysqli_connect($host,$user,$password,$db);
-
-if(!$conn){
+if(!$db){
 	echo "Veri tabanına bağlanılamadı";
-	
-}/*
+}
+$kullanicilar = $db->query('SELECT * FROM login',PDO::FETCH_ASSOC)->fetchAll();
+print_r($kullanicilar);
+/*
 require_once('baglan.php');
 $sorgu = $db->prepare("SELECT * FROM login WHERE username='$username' AND password ='$password'");
 $sorgu->execute();
@@ -22,19 +18,14 @@ if(isset($_POST['username']))
 {
 	$username = $_POST['username'];
 	$password = $_POST['password'];
-
-	$query = mysqli_query($conn,"SELECT * FROM login WHERE username='$username' AND password ='$password'");
+	$query = $db->query("SELECT * FROM login WHERE username='$username' AND password ='$password'");
 	
-	$numrows= mysqli_num_rows($query);
 
-	if($numrows > 0)	
-	{	
-	$_SESSION["username"]= $username; 	
-	$error = "<div class='alert alert-success text-center' role='alert'> Login is Successfull. Yönlendiriliyor...</div>";	
-	header("refresh:3;url=main.html");
-	}
-	else	
-	{	
+	if($query){	
+		$_SESSION["username"]= $username; 	
+		$error = "<div class='alert alert-success text-center' role='alert'> Login is Successfull. Yönlendiriliyor...</div>";	
+		header("refresh:3;url=main.php?hafta=1&sezon=1920");
+	}else{
 		$error = "<div class='alert alert-danger text-center' role='alert'>Username/Password is incorrect.</div>";	
 	}
 	
