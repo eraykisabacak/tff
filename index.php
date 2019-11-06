@@ -5,7 +5,7 @@ if(!$db){
 	echo "Veri tabanına bağlanılamadı";
 }
 $kullanicilar = $db->query('SELECT * FROM login',PDO::FETCH_ASSOC)->fetchAll();
-print_r($kullanicilar);
+//print_r($kullanicilar);
 /*
 require_once('baglan.php');
 $sorgu = $db->prepare("SELECT * FROM login WHERE username='$username' AND password ='$password'");

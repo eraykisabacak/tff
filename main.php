@@ -55,7 +55,7 @@ if($dersler){
     ></script>
     <title>Document</title>
   </head>
-  <body>
+  <body class="main">
       <nav class="navbar navbar-expand-sm bg-danger navbar-light mb-3">
         <div class="container center">
           <ul class="navbar-nav center">
@@ -79,7 +79,7 @@ if($dersler){
     </div>
     <div class="card">
       <h1 class="text-center"><?php echo $hafta ?>.HAFTA - Sezon <?php $ilk =mb_substr($sezon,0,2); $son =mb_substr($sezon,2,4);  echo "20".$ilk."-"."20".(string)$son  ?></h1>
-      <a href="http://localhost/TFF/karsilastir.php?hafta=<?php echo $sayi ?>&sezon=<?php echo $sezon ?>&macid=<?php echo $id ?>" class="btn btn-primary btn-block">Önceki Sezon İle Karşılaştır</a>
+      <a href="http://localhost/TFF/karsilastir.php?hafta=<?php echo $hafta ?>" class="btn btn-primary btn-block">Önceki Sezon İle Karşılaştır</a>
       <?php if($dersler){ for($i = 0; $i < count($dersler);$i++){ ?>
       <div class="card-body">
         <div class="container">
@@ -111,5 +111,8 @@ if($dersler){
       </div>
         <?php } }else{ ?><h1 class="container text-center">Bulunamadı</h1> <?php } ?>           
     </div>
+    <link href="https://fonts.googleapis.com/css?family=Fjalla+One" rel="stylesheet"> 
+
+    <?php require('scoreTable.html') ?>
   </body>
 </html>

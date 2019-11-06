@@ -4,9 +4,12 @@ require_once('baglan.php');
 
 $macid = (isset($_GET['macid']) && $_GET['macid'] > 0) ? $_GET['macid'] : -1;
 //print_r($macid);
+
 if($macid != -1){
   $dersler = $db->query("SELECT * FROM mac WHERE id='$macid'",PDO::FETCH_ASSOC)->fetchAll();
-  //print_r($dersler[0]);
+ // print_r($dersler[0]['hafta']);
+  $hafta = $dersler[0]['hafta'];
+  //echo $hafta;
   $evSahibiId = $dersler[0][evSahibiTakimId];
   //print_r($evSahibiId);
   $deplansmanId = $dersler[0][deplansmanTakimId];
@@ -14,16 +17,31 @@ if($macid != -1){
   $evSahibiTakim =  $db->query("SELECT * FROM takim WHERE takim.id = $evSahibiId",PDO::FETCH_ASSOC)->fetchAll();
   $deplansmanTakim =  $db->query("SELECT * FROM takim WHERE takim.id = $deplansmanId",PDO::FETCH_ASSOC)->fetchAll();
 
-  print_r($evSahibiTakim);
-  print_r($deplansmanTakim);
+  //print_r($evSahibiTakim);
+ // print_r($deplansmanTakim);
     
 }
 else{
   header("Refresh: 1; url=main.php?hafta=1&sezon=1920"); 
 }
 
+if(isset($_POST['newEvSahibiGol']) && isset($_POST['newDeplansmanGol'])){
+  $newEvSahibiGol = $_POST['newEvSahibiGol'];
+  $newDeplansmanGol = $_POST['newDeplansmanGol'];
 
-
+  $query = $db->prepare("UPDATE mac SET
+  evSahibiGol='$newEvSahibiGol',
+  deplansmanGol='$newDeplansmanGol'
+  WHERE id = '$macid'");
+  $update = $query->execute();
+  if ( $update ){
+    $error = "<div class='alert alert-success text-center' role='alert'> Güncelleme Başarılı Skor Sayfasına Yönelendiriliyorsunuz...</div>";
+    header("refresh:3;url=main.php?hafta=$hafta&sezon=1920");
+  }
+  else{
+    echo "Başarısız";
+  }
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -53,7 +71,7 @@ else{
       integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
       crossorigin="anonymous"
     ></script>
-    <title>Document</title>
+    <title>Maç Düzenleme</title>
   </head>
   <body>
       <nav class="navbar navbar-expand-sm bg-danger navbar-light mb-3">
@@ -67,9 +85,22 @@ else{
         </nav>
 
         <div class="container text-center">
-          <div class="card">
-            <h1 class="text-center"></h1> 
-          </div>  
+          <form class="login100-form validate-form" method="POST" action="#">
+            <div class="row">
+              <div class="col">
+                <label><?php echo $evSahibiTakim[0]['takimAdi'] ?></label>
+                <input type="text" class="form-control" name="newEvSahibiGol" value="<?php echo $dersler[0]['evSahibiGol'] ?>">
+              </div>
+              <div class="col">
+                <label for="formGroupExampleInput"><?php echo $deplansmanTakim[0]['takimAdi'] ?></label>
+                <input type="text" class="form-control" name="newDeplansmanGol" value="<?php echo $dersler[0]['deplansmanGol'] ?>">
+              </div>
+            </div>
+            <button class="btn btn-success mt-2">Kayıt Et</button>
+          </form>
         </div>
+        
+        <?= $error ; ?>
+
   </body>
 </html>
