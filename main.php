@@ -1,5 +1,47 @@
 <?php
 require_once('baglan.php');
+
+class Takim{
+  public $takimId, 
+         $takimAdi, 
+         $takimLogo,
+         $oynananmac, 
+         $galibiyet, 
+         $beraberlik, 
+         $maglubiyet,
+         $atilangol,
+         $yenilengol,
+         $avaraj,
+         $puan;
+  function __construct($takimId, $takimAdi, $takimLogo){
+      $this->takimId = $takimId;
+      $this->takimAdi = $takimAdi;
+      $this->takimLogo = $takimLogo;
+      $this->oynananmac = 0;
+      $this->galibiyet = 0;
+      $this->beraberlik = 0; 
+      $this->maglubiyet = 0; 
+      $this->atilangol = 0;
+      $this->yenilengol = 0;
+      $this->avaraj = 0;
+      $this->puan = 0;
+  }
+}
+
+$takimlar = $db->query("SELECT * FROM takim",PDO::FETCH_ASSOC)->fetchAll();
+//print_r($takimlar);
+//echo count($takimlar);
+$takimlarDizisi[] = array();
+$a = 0;
+while($a < count($takimlar)){
+  array_push($takimlarDizisi,new Takim($takimlar[$a][id]
+                                      ,$takimlar[$a][takimAdi]
+                                      ,$takimlar[$a][takimLogo]));
+  $a++;
+} 
+
+//print_r($takimlarDizisi);
+
 $hafta = isset($_GET['hafta']) && isset($_GET['sezon']) && 
   ($_GET['hafta'] > 0) && ($_GET['hafta'] < 35) ? $_GET['hafta'] : 1;
 
@@ -8,6 +50,26 @@ $sezon = ($_GET['sezon'] == "1819" || $_GET['sezon'] == "1920") &&
 
 $dersler = $db->query("SELECT * FROM mac WHERE sezon='$sezon' AND hafta='$hafta'",PDO::FETCH_ASSOC)->fetchAll();
 //print_r($dersler);
+
+$i = 0;
+
+// Kim yendiği berabera kalma durumu
+while($i < 9){
+  if($dersler[$i][evSahibiGol] > $dersler[$i][deplansmanGol]){
+    //$takimlarDizisi[$dersler[$i][evSahibiTakimId]]->puan += 3;
+      //echo $dersler[$i][evSahibiTakimId]."<br />";
+  }
+  elseif($dersler[$i][evSahibiGol] < $dersler[$i][deplansmanGol]){
+   // $takimlarDizisi[$dersler[$i][deplansmanTakimId]]->puan += 3;
+    //echo $dersler[$i][deplansmanTakimId]."<br />";
+  }
+  else{
+    //echo "+1 +1"."<br />";
+  }
+  $i++;
+}
+
+//print_r($takimlarDizisi);
 
 if($dersler){
     $evSahibiTakim =  $db->query("SELECT takim.takimAdi,
@@ -23,6 +85,7 @@ if($dersler){
 }else{
   echo "Herhangi bir maç bulunmuyor";
 }
+
 
 ?>
 <!DOCTYPE html>
@@ -113,6 +176,6 @@ if($dersler){
     </div>
     <link href="https://fonts.googleapis.com/css?family=Fjalla+One" rel="stylesheet"> 
 
-    <?php require('scoreTable.html') ?>
+    <?php require('scoreTable.php') ?>
   </body>
 </html>

@@ -126,7 +126,7 @@ if($yeniSezon){
                 </div>
                     <?php } }else{ ?><h1 class="container text-center">Bulunamadı</h1> <?php } ?>
                     
-    <?php require('scoreTable.html') ?>
+    <?php require('scoreTable.php') ?>
             </div>
             <div class="col">
                 <h1 class="text-center"><?php echo $hafta ?>.HAFTA - Sezon 2019-2020</h1>
@@ -161,7 +161,7 @@ if($yeniSezon){
                 </div>
                     <?php } }else{ ?><h1 class="container text-center">Bulunamadı</h1> <?php } ?>
 
-                    <?php require('scoreTable.html') ?>
+                    <?php require('scoreTable.php') ?>
             </div>
         </div>           
     </div>
