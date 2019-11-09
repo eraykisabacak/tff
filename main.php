@@ -47,14 +47,23 @@ $hafta = isset($_GET['hafta']) && isset($_GET['sezon']) &&
 $sezon = ($_GET['sezon'] == "1819" || $_GET['sezon'] == "1920") && 
     isset($_GET['sezon']) && isset($_GET['hafta']) ? $_GET['sezon'] : 1920;
 
+$dersler = array();
+
 $dersler = $db->query("SELECT * FROM mac WHERE sezon='$sezon' AND hafta='$hafta'",PDO::FETCH_ASSOC)->fetchAll();
-
-
+print_r($dersler);
+/*
+$haftaSayisi = $_GET['hafta'];
+while($haftaSayisi >= 1){
+  $haftalik = $db->query("SELECT * FROM mac WHERE sezon='$sezon' AND hafta='$haftaSayisi'",PDO::FETCH_ASSOC)->fetchAll();
+  //print_r($haftalik);
+  array_push($dersler,$haftalik);
+  $haftaSayisi--;
+}
+print_r($dersler);*/
 // Kim yendiği berabera kalma durumu
 $i = 0;
 while($i < 9){
   if($dersler[$i][evSahibiGol] > $dersler[$i][deplansmanGol]){
-    $takimlarDizisi[$dersler[$i][evSahibiTakimId]]->puan += 3;
     for($a = 0 ; $a < $takimDizisiCount; $a++){
       if($takimlarDizisi[$a]->takimId == $dersler[$i][evSahibiTakimId]){
         $takimlarDizisi[$a]->oynananmac += 1;
@@ -114,8 +123,6 @@ while($i < 9){
   }
   $i++;
 }
-
-//print_r($takimlarDizisi);
 
 if($dersler){
     $evSahibiTakim =  $db->query("SELECT takim.takimAdi,

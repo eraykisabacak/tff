@@ -1,6 +1,6 @@
 <?php
+
 $skorTablosu = $db->query("SELECT * FROM skortablosu20192020",PDO::FETCH_ASSOC)->fetchAll();
-//print_r($skorTablosu);
 
 $takimIsim = $db->query("SELECT * FROM takim",PDO::FETCH_ASSOC)->fetchAll();
 
@@ -18,7 +18,13 @@ function quickSort($arr)
 	for($i = 1; $i < $count ; $i++){
 		if($middle->puan < $arr[$i]->puan){
 			$leftArray[] = $arr[$i];
-		}else {
+		}elseif($middle->puan == $arr[$i]->puan) {
+			if($middle->avaraj < $arr[$i]->avaraj){
+				$leftArray[] = $arr[$i];
+			}else{
+				$rightArray[] = $arr[$i];
+			}
+		}else{
 			$rightArray[] = $arr[$i];
 		}	
 	}
@@ -59,16 +65,16 @@ $takimlarDizisi = quickSort($takimlarDizisi);
 							  </tr>
 
 							  <?php 
-							  for($i = 0 ; $i <=17;$i++)
+							  $sira = 0;
+							  for($i = 0 ; $i <=22;$i++)
 							  { ?>
 							  <tr class=<?php 
 							  if($i <= 3){ echo "wpos";}else{ echo "pos";} ?>>
 							  	<?php 
-							  		$id = $skorTablosu[$i]['takimId'];
-									  $takimIsim = $db->query("SELECT takimAdi FROM takim WHERE id=$id",PDO::FETCH_ASSOC)->fetchAll();
-									  
+									  $id = $skorTablosu[$i]['takimId'];
+									  if($takimlarDizisi[$i]->oynananmac != 0){ $sira++;
 								  ?>
-								  <td><?php echo ($i) + 1 ?></td>
+								  <td><?php echo $sira ?></td>
 								  <td><?php echo $takimlarDizisi[$i]->takimAdi?></td>
 								  <td><?php echo $takimlarDizisi[$i]->oynananmac?></td>
 								  <td><?php echo $takimlarDizisi[$i]->galibiyet?></td>
@@ -78,7 +84,7 @@ $takimlarDizisi = quickSort($takimlarDizisi);
 								  <td><?php echo $takimlarDizisi[$i]->yenilengol?></td>
 								  <td><?php echo $takimlarDizisi[$i]->avaraj?></td>
 								  <td><?php echo $takimlarDizisi[$i]->puan?></td>
-							<?php } ?>
+							<?php } } ?>
 				</table>
 			  </div>
 </body>

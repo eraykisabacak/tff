@@ -2,39 +2,34 @@
 require_once('baglan.php');
 $hafta = isset($_GET['hafta']) && ($_GET['hafta'] > 0) && ($_GET['hafta'] < 35) ? $_GET['hafta'] : 1;
 
-//echo $hafta;
 $oncekiSezon = $db->query("SELECT * FROM mac WHERE sezon=1819 AND hafta='$hafta'",PDO::FETCH_ASSOC)->fetchAll();
-//print_r($oncekiSezon);  
+
 $takimIdevSahibi = $oncekiSezon[0]['evSahibiTakimId'];
-//echo $takimIdevSahibi;
 
 $takimIddeplansmans = $oncekiSezon[0]['deplansmanTakimId'];
-//echo $takimIddeplansmans;
 
 if($oncekiSezon){
     $evSahibiTakim =  $db->query("SELECT takim.takimAdi,mac.evSahibiTakimId,mac.evSahibiGol,takim.takimLogo  
                                   FROM takim,mac WHERE mac.evSahibiTakimId=takim.id AND mac.hafta='$hafta' AND mac.sezon=1819",PDO::FETCH_ASSOC)->fetchAll();
-    //print_r($evSahibiTakim);
+    
 
     $deplansmanTakim =  $db->query("SELECT takim.takimAdi,mac.deplansmanTakimId,mac.deplansmanGol,takim.takimLogo 
                                     FROM takim,mac WHERE mac.deplansmanTakimId=takim.id AND mac.hafta='$hafta' AND mac.sezon=1819",PDO::FETCH_ASSOC)->fetchAll();
-    //print_r($deplansmanTakim);
 
 }
 
 $yeniSezon = $db->query("SELECT * FROM mac WHERE sezon=1920 AND hafta='$hafta'",PDO::FETCH_ASSOC)->fetchAll();
-//print_r($yeniSezon);  
-//print_r(count($yeniSezon));  
+
 if($yeniSezon){
     $evSahibiTakimYeni =  $db->query("SELECT takim.takimAdi,
                                   mac.evSahibiTakimId,mac.evSahibiGol,takim.takimLogo 
                                   FROM takim,mac WHERE mac.evSahibiTakimId=takim.id AND mac.hafta='$hafta' AND mac.sezon=1920",PDO::FETCH_ASSOC)->fetchAll();
-   // print_r($evSahibiTakimYeni);
+   
 
     $deplansmanTakimYeni =  $db->query("SELECT takim.takimAdi,
                                   mac.deplansmanTakimId,mac.deplansmanGol,takim.takimLogo 
                                   FROM takim,mac WHERE mac.deplansmanTakimId=takim.id AND mac.hafta='$hafta' AND mac.sezon=1920",PDO::FETCH_ASSOC)->fetchAll();
-    //print_r($deplansmanTakimYeni);
+    
 
 }
 ?>
