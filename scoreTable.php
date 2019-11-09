@@ -1,9 +1,36 @@
-<?php 
+<?php
 $skorTablosu = $db->query("SELECT * FROM skortablosu20192020",PDO::FETCH_ASSOC)->fetchAll();
 //print_r($skorTablosu);
 
 $takimIsim = $db->query("SELECT * FROM takim",PDO::FETCH_ASSOC)->fetchAll();
-//print_r($takimIsim);
+
+function quickSort($arr)
+{
+	$count = count($arr);
+
+	if ($count < 2) {
+		return $arr;
+	}
+
+	$leftArray = $rightArray = array();
+	$middle = $arr[0];
+
+	for($i = 1; $i < $count ; $i++){
+		if($middle->puan < $arr[$i]->puan){
+			$leftArray[] = $arr[$i];
+		}else {
+			$rightArray[] = $arr[$i];
+		}	
+	}
+
+	$leftArray = quickSort($leftArray);
+	$rightArray = quickSort($rightArray);
+
+	return array_merge($leftArray, array($middle), $rightArray);
+}
+
+$takimlarDizisi = quickSort($takimlarDizisi);
+
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -32,8 +59,6 @@ $takimIsim = $db->query("SELECT * FROM takim",PDO::FETCH_ASSOC)->fetchAll();
 							  </tr>
 
 							  <?php 
-							  //echo $skorTablosu[$i]['takimId'];
-							  //echo $takimIsim['id'];
 							  for($i = 0 ; $i <=17;$i++)
 							  { ?>
 							  <tr class=<?php 
@@ -41,18 +66,18 @@ $takimIsim = $db->query("SELECT * FROM takim",PDO::FETCH_ASSOC)->fetchAll();
 							  	<?php 
 							  		$id = $skorTablosu[$i]['takimId'];
 									  $takimIsim = $db->query("SELECT takimAdi FROM takim WHERE id=$id",PDO::FETCH_ASSOC)->fetchAll();
-									  //print_r($takimIsim);
+									  
 								  ?>
 								  <td><?php echo ($i) + 1 ?></td>
-								  <td><?php echo $takimIsim[0]['takimAdi']?></td>
-								  <td><?php echo $skorTablosu[$i]['oynananmac']?></td>
-								  <td><?php echo $skorTablosu[$i]['galibiyet']?></td>
-								  <td><?php echo $skorTablosu[$i]['beraberlik']?></td>
-								  <td><?php echo $skorTablosu[$i]['maglubiyet']?></td>
-								  <td><?php echo $skorTablosu[$i]['atilangol']?></td>
-								  <td><?php echo $skorTablosu[$i]['yenilengol']?></td>
-								  <td><?php echo $skorTablosu[$i]['avaraj']?></td>
-								  <td><?php echo $skorTablosu[$i]['puan']?></td>
+								  <td><?php echo $takimlarDizisi[$i]->takimAdi?></td>
+								  <td><?php echo $takimlarDizisi[$i]->oynananmac?></td>
+								  <td><?php echo $takimlarDizisi[$i]->galibiyet?></td>
+								  <td><?php echo $takimlarDizisi[$i]->beraberlik?></td>
+								  <td><?php echo $takimlarDizisi[$i]->maglubiyet?></td>
+								  <td><?php echo $takimlarDizisi[$i]->atilangol?></td>
+								  <td><?php echo $takimlarDizisi[$i]->yenilengol?></td>
+								  <td><?php echo $takimlarDizisi[$i]->avaraj?></td>
+								  <td><?php echo $takimlarDizisi[$i]->puan?></td>
 							<?php } ?>
 				</table>
 			  </div>
