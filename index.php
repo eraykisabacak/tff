@@ -1,9 +1,15 @@
 <?php
 require_once('baglan.php');
-
+session_start();
+ob_start();
 if(!$db){
 	echo "Veri tabanına bağlanılamadı";
 }
+if(isset($_SESSION["username"])){
+	echo "<h1>Yönlendiriliyorsunuz</h1>";
+	header("Refresh: 2; url=main.php");
+	exit;
+  }
 $kullanicilar = $db->query('SELECT * FROM login',PDO::FETCH_ASSOC)->fetchAll();
 
 if(isset($_POST['username']))
@@ -17,6 +23,7 @@ if(isset($_POST['username']))
 		$_SESSION["username"]= $username; 	
 		$error = "<div class='alert alert-success text-center' role='alert'> Login is Successfull. Yönlendiriliyor...</div>";	
 		header("refresh:3;url=main.php?hafta=1&sezon=1920");
+		
 	}else{
 		$error = "<div class='alert alert-danger text-center' role='alert'>Username/Password is incorrect.</div>";	
 	}

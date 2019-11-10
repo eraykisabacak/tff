@@ -1,13 +1,129 @@
 <?php
 require_once('baglan.php');
+
+session_start();
+ob_start();
+
+if(!isset($_SESSION["username"])){
+  echo "<h1>Bu Sayfaya Girmeye Yetkiniz Yok</h1>";
+  header("Refresh: 2; url=index.php");
+  exit;
+}
+
+class Takim{
+  public $takimId, 
+         $takimAdi, 
+         $takimLogo,
+         $oynananmac, 
+         $galibiyet, 
+         $beraberlik, 
+         $maglubiyet,
+         $atilangol,
+         $yenilengol,
+         $avaraj,
+         $puan;
+  function __construct($takimId, $takimAdi, $takimLogo){
+      $this->takimId = $takimId;
+      $this->takimAdi = $takimAdi;
+      $this->takimLogo = $takimLogo;
+      $this->oynananmac = 0;
+      $this->galibiyet = 0;
+      $this->beraberlik = 0; 
+      $this->maglubiyet = 0; 
+      $this->atilangol = 0;
+      $this->yenilengol = 0;
+      $this->avaraj = 0;
+      $this->puan = 0;
+  }
+}
+
+$takimlar = $db->query("SELECT * FROM takim",PDO::FETCH_ASSOC)->fetchAll();
+
+static $takimlarDizisi = array();
+$a = 0;
+while($a < count($takimlar)){
+  array_push($takimlarDizisi,new Takim($takimlar[$a][id]
+                                      ,$takimlar[$a][takimAdi]
+                                      ,$takimlar[$a][takimLogo]));
+  $a++;
+} 
+print_r($takimDizisi[0]);
+
+$takimDizisiCount = count($takimlarDizisi);
+
 $hafta = isset($_GET['hafta']) && ($_GET['hafta'] > 0) && ($_GET['hafta'] < 35) ? $_GET['hafta'] : 1;
 
 $oncekiSezon = $db->query("SELECT * FROM mac WHERE sezon=1819 AND hafta='$hafta'",PDO::FETCH_ASSOC)->fetchAll();
+$yeniSezon = $db->query("SELECT * FROM mac WHERE sezon=1920 AND hafta='$hafta'",PDO::FETCH_ASSOC)->fetchAll();
 
-$takimIdevSahibi = $oncekiSezon[0]['evSahibiTakimId'];
+for($haftalik = 1; $haftalik <= $hafta;$haftalik++){
+  $dersler = array();
 
-$takimIddeplansmans = $oncekiSezon[0]['deplansmanTakimId'];
+  $dersler = $db->query("SELECT * FROM mac WHERE sezon=1819 AND hafta='$haftalik'",PDO::FETCH_ASSOC)->fetchAll();
+  $i = 0;
 
+  while($i < 9){
+    if($dersler[$i][evSahibiGol] > $dersler[$i][deplansmanGol]){
+      for($a = 0 ; $a < $takimDizisiCount; $a++){
+        if($takimlarDizisi[$a]->takimId == $dersler[$i][evSahibiTakimId]){
+          $takimlarDizisi[$a]->oynananmac += 1;
+          $takimlarDizisi[$a]->galibiyet += 1;
+          $takimlarDizisi[$a]->atilangol += $dersler[$i][evSahibiGol];
+          $takimlarDizisi[$a]->yenilengol += $dersler[$i][deplansmanGol];
+          $takimlarDizisi[$a]->avaraj = $takimlarDizisi[$a]->atilangol - $takimlarDizisi[$a]->yenilengol;
+          $takimlarDizisi[$a]->puan += 3;
+        }
+        if($takimlarDizisi[$a]->takimId == $dersler[$i][deplansmanTakimId]){
+          $takimlarDizisi[$a]->oynananmac += 1;
+          $takimlarDizisi[$a]->maglubiyet += 1;
+          $takimlarDizisi[$a]->atilangol += $dersler[$i][deplansmanGol];
+          $takimlarDizisi[$a]->yenilengol += $dersler[$i][evSahibiGol];
+          $takimlarDizisi[$a]->avaraj = $takimlarDizisi[$a]->atilangol - $takimlarDizisi[$a]->yenilengol;
+        }
+      }
+    }
+    elseif($dersler[$i][evSahibiGol] < $dersler[$i][deplansmanGol]){
+        for($a = 0 ; $a < $takimDizisiCount; $a++){
+          if($takimlarDizisi[$a]->takimId == $dersler[$i][deplansmanTakimId]){
+            $takimlarDizisi[$a]->oynananmac += 1;
+            $takimlarDizisi[$a]->galibiyet += 1;
+            $takimlarDizisi[$a]->atilangol += $dersler[$i][deplansmanGol];
+            $takimlarDizisi[$a]->yenilengol += $dersler[$i][evSahibiGol];
+            $takimlarDizisi[$a]->avaraj = $takimlarDizisi[$a]->atilangol - $takimlarDizisi[$a]->yenilengol;
+            $takimlarDizisi[$a]->puan += 3;
+          }
+          if($takimlarDizisi[$a]->takimId == $dersler[$i][evSahibiTakimId]){
+            $takimlarDizisi[$a]->oynananmac += 1;
+            $takimlarDizisi[$a]->maglubiyet += 1;
+            $takimlarDizisi[$a]->atilangol += $dersler[$i][evSahibiGol];
+            $takimlarDizisi[$a]->yenilengol += $dersler[$i][deplansmanGol];
+            $takimlarDizisi[$a]->avaraj = $takimlarDizisi[$a]->atilangol - $takimlarDizisi[$a]->yenilengol;
+          }
+        }
+    }
+    else{
+      for($a = 0 ; $a < $takimDizisiCount; $a++){
+        if($takimlarDizisi[$a]->takimId == $dersler[$i][evSahibiTakimId]){
+          $takimlarDizisi[$a]->oynananmac += 1;
+          $takimlarDizisi[$a]->beraberlik += 1;
+          $takimlarDizisi[$a]->atilangol += $dersler[$i][evSahibiGol];
+          $takimlarDizisi[$a]->yenilengol += $dersler[$i][deplansmanGol];
+          $takimlarDizisi[$a]->avaraj = $takimlarDizisi[$a]->atilangol - $takimlarDizisi[$a]->yenilengol;
+          $takimlarDizisi[$a]->puan += 1;
+        }
+        if($takimlarDizisi[$a]->takimId == $dersler[$i][deplansmanTakimId]){
+          $takimlarDizisi[$a]->oynananmac += 1;
+          $takimlarDizisi[$a]->beraberlik += 1;
+          $takimlarDizisi[$a]->atilangol += $dersler[$i][evSahibiGol];
+          $takimlarDizisi[$a]->yenilengol += $dersler[$i][deplansmanGol];
+          $takimlarDizisi[$a]->avaraj = $takimlarDizisi[$a]->atilangol - $takimlarDizisi[$a]->yenilengol;
+          $takimlarDizisi[$a]->puan += 1;
+        }
+      }
+    }
+    $i++;
+  }
+}
 if($oncekiSezon){
     $evSahibiTakim =  $db->query("SELECT takim.takimAdi,mac.evSahibiTakimId,mac.evSahibiGol,takim.takimLogo  
                                   FROM takim,mac WHERE mac.evSahibiTakimId=takim.id AND mac.hafta='$hafta' AND mac.sezon=1819",PDO::FETCH_ASSOC)->fetchAll();
@@ -29,8 +145,6 @@ if($yeniSezon){
     $deplansmanTakimYeni =  $db->query("SELECT takim.takimAdi,
                                   mac.deplansmanTakimId,mac.deplansmanGol,takim.takimLogo 
                                   FROM takim,mac WHERE mac.deplansmanTakimId=takim.id AND mac.hafta='$hafta' AND mac.sezon=1920",PDO::FETCH_ASSOC)->fetchAll();
-    
-
 }
 ?>
 
@@ -69,7 +183,7 @@ if($yeniSezon){
         <div class="container center">
           <ul class="navbar-nav center">
             <li class="nav-item active">
-              <a class="nav-link" href="#"><img width="30%" height="30%" src="Başlıksız-1.png" alt="">
+              <a class="nav-link" href="http://localhost/TFF/main.php"><img width="30%" height="30%" src="Başlıksız-1.png" alt="">
             </li>
           </ul>
         </div>
@@ -121,7 +235,7 @@ if($yeniSezon){
                 </div>
                     <?php } }else{ ?><h1 class="container text-center">Bulunamadı</h1> <?php } ?>
                     
-    <?php require('scoreTable.php') ?>
+    <?php require('scoreTable2018.php'); ?>
             </div>
             <div class="col">
                 <h1 class="text-center"><?php echo $hafta ?>.HAFTA - Sezon 2019-2020</h1>
@@ -156,7 +270,7 @@ if($yeniSezon){
                 </div>
                     <?php } }else{ ?><h1 class="container text-center">Bulunamadı</h1> <?php } ?>
 
-                    <?php require('scoreTable.php') ?>
+                    <?php require('scoreTable.php'); ?>
             </div>
         </div>           
     </div>

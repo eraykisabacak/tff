@@ -7,7 +7,7 @@ if(!isset($_SESSION["username"])){
 session_start();
 ob_start();
 
-$skorTablosu = $db->query("SELECT * FROM skortablosu20192020",PDO::FETCH_ASSOC)->fetchAll();
+$skorTablosu = $db->query("SELECT * FROM skortablosu20182019",PDO::FETCH_ASSOC)->fetchAll();
 
 $takimIsim = $db->query("SELECT * FROM takim",PDO::FETCH_ASSOC)->fetchAll();
 
@@ -79,7 +79,8 @@ $takimlarDizisi = quickSort($takimlarDizisi);
 							  if($i <= 3){ echo "wpos";}else{ echo "pos";} ?>>
 							  	<?php 
 									  $id = $skorTablosu[$i]['takimId'];
-									  if($takimlarDizisi[$i]->oynananmac != 0){ $sira++;
+									  if($takimlarDizisi[$i]->oynananmac != 0){
+									  $sira++;
 								  ?>
 								  <td><?php echo $sira ?></td>
 								  <td><?php echo $takimlarDizisi[$i]->takimAdi?></td>
@@ -91,7 +92,7 @@ $takimlarDizisi = quickSort($takimlarDizisi);
 								  <td><?php echo $takimlarDizisi[$i]->yenilengol?></td>
 								  <td><?php echo $takimlarDizisi[$i]->avaraj?></td>
 								  <td><?php echo $takimlarDizisi[$i]->puan?></td>
-							<?php } } ?>
+									  <?php } } ?>
 				</table>
 			  </div>
 </body>

@@ -1,6 +1,12 @@
 <?php
 require_once('baglan.php');
-
+session_start();
+ob_start();
+if(!isset($_SESSION["username"])){
+  echo "<h1>Bu Sayfaya Girmeye Yetkiniz Yok</h1>";
+  header("Refresh: 2; url=index.php");
+  exit;
+}
 class Takim{
   public $takimId, 
          $takimAdi, 
@@ -47,81 +53,75 @@ $hafta = isset($_GET['hafta']) && isset($_GET['sezon']) &&
 $sezon = ($_GET['sezon'] == "1819" || $_GET['sezon'] == "1920") && 
     isset($_GET['sezon']) && isset($_GET['hafta']) ? $_GET['sezon'] : 1920;
 
+// Kim yendiği berabera kalma durumu
+for($haftalik = 1; $haftalik <= $hafta;$haftalik++){
 $dersler = array();
 
-$dersler = $db->query("SELECT * FROM mac WHERE sezon='$sezon' AND hafta='$hafta'",PDO::FETCH_ASSOC)->fetchAll();
-print_r($dersler);
-/*
-$haftaSayisi = $_GET['hafta'];
-while($haftaSayisi >= 1){
-  $haftalik = $db->query("SELECT * FROM mac WHERE sezon='$sezon' AND hafta='$haftaSayisi'",PDO::FETCH_ASSOC)->fetchAll();
-  //print_r($haftalik);
-  array_push($dersler,$haftalik);
-  $haftaSayisi--;
-}
-print_r($dersler);*/
-// Kim yendiği berabera kalma durumu
+$dersler = $db->query("SELECT * FROM mac WHERE sezon='$sezon' AND hafta='$haftalik'",PDO::FETCH_ASSOC)->fetchAll();
 $i = 0;
-while($i < 9){
-  if($dersler[$i][evSahibiGol] > $dersler[$i][deplansmanGol]){
-    for($a = 0 ; $a < $takimDizisiCount; $a++){
-      if($takimlarDizisi[$a]->takimId == $dersler[$i][evSahibiTakimId]){
-        $takimlarDizisi[$a]->oynananmac += 1;
-        $takimlarDizisi[$a]->galibiyet += 1;
-        $takimlarDizisi[$a]->atilangol += $dersler[$i][evSahibiGol];
-        $takimlarDizisi[$a]->yenilengol += $dersler[$i][deplansmanGol];
-        $takimlarDizisi[$a]->avaraj = $takimlarDizisi[$a]->atilangol - $takimlarDizisi[$a]->yenilengol;
-        $takimlarDizisi[$a]->puan += 3;
-      }
-      if($takimlarDizisi[$a]->takimId == $dersler[$i][deplansmanTakimId]){
-        $takimlarDizisi[$a]->oynananmac += 1;
-        $takimlarDizisi[$a]->maglubiyet += 1;
-        $takimlarDizisi[$a]->atilangol += $dersler[$i][deplansmanGol];
-        $takimlarDizisi[$a]->yenilengol += $dersler[$i][evSahibiGol];
-        $takimlarDizisi[$a]->avaraj = $takimlarDizisi[$a]->atilangol - $takimlarDizisi[$a]->yenilengol;
-      }
-    }
-  }
-  elseif($dersler[$i][evSahibiGol] < $dersler[$i][deplansmanGol]){
+  while($i < 9){
+    if($dersler[$i][evSahibiGol] > $dersler[$i][deplansmanGol]){
       for($a = 0 ; $a < $takimDizisiCount; $a++){
-        if($takimlarDizisi[$a]->takimId == $dersler[$i][deplansmanTakimId]){
-          $takimlarDizisi[$a]->oynananmac += 1;
-          $takimlarDizisi[$a]->galibiyet += 1;
-          $takimlarDizisi[$a]->atilangol += $dersler[$i][deplansmanGol];
-          $takimlarDizisi[$a]->yenilengol += $dersler[$i][evSahibiGol];
-          $takimlarDizisi[$a]->avaraj = $takimlarDizisi[$a]->atilangol - $takimlarDizisi[$a]->yenilengol;
-          $takimlarDizisi[$a]->puan += 3;
-        }
         if($takimlarDizisi[$a]->takimId == $dersler[$i][evSahibiTakimId]){
           $takimlarDizisi[$a]->oynananmac += 1;
-          $takimlarDizisi[$a]->maglubiyet += 1;
+          $takimlarDizisi[$a]->galibiyet += 1;
           $takimlarDizisi[$a]->atilangol += $dersler[$i][evSahibiGol];
           $takimlarDizisi[$a]->yenilengol += $dersler[$i][deplansmanGol];
           $takimlarDizisi[$a]->avaraj = $takimlarDizisi[$a]->atilangol - $takimlarDizisi[$a]->yenilengol;
+          $takimlarDizisi[$a]->puan += 3;
+        }
+        if($takimlarDizisi[$a]->takimId == $dersler[$i][deplansmanTakimId]){
+          $takimlarDizisi[$a]->oynananmac += 1;
+          $takimlarDizisi[$a]->maglubiyet += 1;
+          $takimlarDizisi[$a]->atilangol += $dersler[$i][deplansmanGol];
+          $takimlarDizisi[$a]->yenilengol += $dersler[$i][evSahibiGol];
+          $takimlarDizisi[$a]->avaraj = $takimlarDizisi[$a]->atilangol - $takimlarDizisi[$a]->yenilengol;
         }
       }
-  }
-  else{
-    for($a = 0 ; $a < $takimDizisiCount; $a++){
-      if($takimlarDizisi[$a]->takimId == $dersler[$i][evSahibiTakimId]){
-        $takimlarDizisi[$a]->oynananmac += 1;
-        $takimlarDizisi[$a]->beraberlik += 1;
-        $takimlarDizisi[$a]->atilangol += $dersler[$i][evSahibiGol];
-        $takimlarDizisi[$a]->yenilengol += $dersler[$i][deplansmanGol];
-        $takimlarDizisi[$a]->avaraj = $takimlarDizisi[$a]->atilangol - $takimlarDizisi[$a]->yenilengol;
-        $takimlarDizisi[$a]->puan += 1;
-      }
-      if($takimlarDizisi[$a]->takimId == $dersler[$i][deplansmanTakimId]){
-        $takimlarDizisi[$a]->oynananmac += 1;
-        $takimlarDizisi[$a]->beraberlik += 1;
-        $takimlarDizisi[$a]->atilangol += $dersler[$i][evSahibiGol];
-        $takimlarDizisi[$a]->yenilengol += $dersler[$i][deplansmanGol];
-        $takimlarDizisi[$a]->avaraj = $takimlarDizisi[$a]->atilangol - $takimlarDizisi[$a]->yenilengol;
-        $takimlarDizisi[$a]->puan += 1;
+    }
+    elseif($dersler[$i][evSahibiGol] < $dersler[$i][deplansmanGol]){
+        for($a = 0 ; $a < $takimDizisiCount; $a++){
+          if($takimlarDizisi[$a]->takimId == $dersler[$i][deplansmanTakimId]){
+            $takimlarDizisi[$a]->oynananmac += 1;
+            $takimlarDizisi[$a]->galibiyet += 1;
+            $takimlarDizisi[$a]->atilangol += $dersler[$i][deplansmanGol];
+            $takimlarDizisi[$a]->yenilengol += $dersler[$i][evSahibiGol];
+            $takimlarDizisi[$a]->avaraj = $takimlarDizisi[$a]->atilangol - $takimlarDizisi[$a]->yenilengol;
+            $takimlarDizisi[$a]->puan += 3;
+          }
+          if($takimlarDizisi[$a]->takimId == $dersler[$i][evSahibiTakimId]){
+            $takimlarDizisi[$a]->oynananmac += 1;
+            $takimlarDizisi[$a]->maglubiyet += 1;
+            $takimlarDizisi[$a]->atilangol += $dersler[$i][evSahibiGol];
+            $takimlarDizisi[$a]->yenilengol += $dersler[$i][deplansmanGol];
+            $takimlarDizisi[$a]->avaraj = $takimlarDizisi[$a]->atilangol - $takimlarDizisi[$a]->yenilengol;
+          }
+        }
+    }
+    else{
+      for($a = 0 ; $a < $takimDizisiCount; $a++){
+        if($takimlarDizisi[$a]->takimId == $dersler[$i][evSahibiTakimId]){
+          $takimlarDizisi[$a]->oynananmac += 1;
+          $takimlarDizisi[$a]->beraberlik += 1;
+          $takimlarDizisi[$a]->atilangol += $dersler[$i][evSahibiGol];
+          $takimlarDizisi[$a]->yenilengol += $dersler[$i][deplansmanGol];
+          $takimlarDizisi[$a]->avaraj = $takimlarDizisi[$a]->atilangol - $takimlarDizisi[$a]->yenilengol;
+          $takimlarDizisi[$a]->puan += 1;
+        }
+        if($takimlarDizisi[$a]->takimId == $dersler[$i][deplansmanTakimId]){
+          $takimlarDizisi[$a]->oynananmac += 1;
+          $takimlarDizisi[$a]->beraberlik += 1;
+          $takimlarDizisi[$a]->atilangol += $dersler[$i][evSahibiGol];
+          $takimlarDizisi[$a]->yenilengol += $dersler[$i][deplansmanGol];
+          $takimlarDizisi[$a]->avaraj = $takimlarDizisi[$a]->atilangol - $takimlarDizisi[$a]->yenilengol;
+          $takimlarDizisi[$a]->puan += 1;
+        }
       }
     }
+    $i++;
   }
-  $i++;
+
+
 }
 
 if($dersler){
@@ -174,7 +174,7 @@ if($dersler){
         <div class="container center">
           <ul class="navbar-nav center">
             <li class="nav-item active">
-              <a class="nav-link" href="#"><img width="30%" height="30%" src="Başlıksız-1.png" alt="">
+              <a class="nav-link" href="http://localhost/TFF/main.php"><img width="30%" height="30%" src="Başlıksız-1.png" alt="">
             </li>
           </ul>
         </div>

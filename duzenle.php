@@ -78,7 +78,7 @@ if(isset($_POST['newEvSahibiGol']) && isset($_POST['newDeplansmanGol'])){
         <div class="container center">
           <ul class="navbar-nav center">
             <li class="nav-item active">
-              <a class="nav-link" href="#"><img width="30%" height="30%" src="Başlıksız-1.png" alt="">
+              <a class="nav-link" href="http://localhost/TFF/main.php"><img width="30%" height="30%" src="Başlıksız-1.png" alt="">
             </li>
           </ul>
         </div>
