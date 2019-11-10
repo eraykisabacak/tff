@@ -47,7 +47,14 @@ while($a < count($takimlar)){
                                       ,$takimlar[$a][takimLogo]));
   $a++;
 } 
-print_r($takimDizisi[0]);
+static $takimlarDizisi2 = array();
+$a = 0;
+while($a < count($takimlar)){
+  array_push($takimlarDizisi2,new Takim($takimlar[$a][id]
+                                      ,$takimlar[$a][takimAdi]
+                                      ,$takimlar[$a][takimLogo]));
+  $a++;
+} 
 
 $takimDizisiCount = count($takimlarDizisi);
 
@@ -58,7 +65,7 @@ $yeniSezon = $db->query("SELECT * FROM mac WHERE sezon=1920 AND hafta='$hafta'",
 
 for($haftalik = 1; $haftalik <= $hafta;$haftalik++){
   $dersler = array();
-
+  
   $dersler = $db->query("SELECT * FROM mac WHERE sezon=1819 AND hafta='$haftalik'",PDO::FETCH_ASSOC)->fetchAll();
   $i = 0;
 
@@ -124,6 +131,76 @@ for($haftalik = 1; $haftalik <= $hafta;$haftalik++){
     $i++;
   }
 }
+
+for($haftalik = 1; $haftalik <= $hafta;$haftalik++){
+  $dersler = array();
+  
+  $dersler = $db->query("SELECT * FROM mac WHERE sezon=1920 AND hafta='$haftalik'",PDO::FETCH_ASSOC)->fetchAll();
+  $i = 0;
+
+  while($i < 9){
+    if($dersler[$i][evSahibiGol] > $dersler[$i][deplansmanGol]){
+      for($a = 0 ; $a < $takimDizisiCount; $a++){
+        if($takimlarDizisi2[$a]->takimId == $dersler[$i][evSahibiTakimId]){
+          $takimlarDizisi2[$a]->oynananmac += 1;
+          $takimlarDizisi2[$a]->galibiyet += 1;
+          $takimlarDizisi2[$a]->atilangol += $dersler[$i][evSahibiGol];
+          $takimlarDizisi2[$a]->yenilengol += $dersler[$i][deplansmanGol];
+          $takimlarDizisi2[$a]->avaraj = $takimlarDizisi2[$a]->atilangol - $takimlarDizisi2[$a]->yenilengol;
+          $takimlarDizisi2[$a]->puan += 3;
+        }
+        if($takimlarDizisi2[$a]->takimId == $dersler[$i][deplansmanTakimId]){
+          $takimlarDizisi2[$a]->oynananmac += 1;
+          $takimlarDizisi2[$a]->maglubiyet += 1;
+          $takimlarDizisi2[$a]->atilangol += $dersler[$i][deplansmanGol];
+          $takimlarDizisi2[$a]->yenilengol += $dersler[$i][evSahibiGol];
+          $takimlarDizisi2[$a]->avaraj = $takimlarDizisi2[$a]->atilangol - $takimlarDizisi2[$a]->yenilengol;
+        }
+      }
+    }
+    elseif($dersler[$i][evSahibiGol] < $dersler[$i][deplansmanGol]){
+        for($a = 0 ; $a < $takimDizisiCount; $a++){
+          if($takimlarDizisi2[$a]->takimId == $dersler[$i][deplansmanTakimId]){
+            $takimlarDizisi2[$a]->oynananmac += 1;
+            $takimlarDizisi2[$a]->galibiyet += 1;
+            $takimlarDizisi2[$a]->atilangol += $dersler[$i][deplansmanGol];
+            $takimlarDizisi2[$a]->yenilengol += $dersler[$i][evSahibiGol];
+            $takimlarDizisi2[$a]->avaraj = $takimlarDizisi2[$a]->atilangol - $takimlarDizisi2[$a]->yenilengol;
+            $takimlarDizisi2[$a]->puan += 3;
+          }
+          if($takimlarDizisi2[$a]->takimId == $dersler[$i][evSahibiTakimId]){
+            $takimlarDizisi2[$a]->oynananmac += 1;
+            $takimlarDizisi2[$a]->maglubiyet += 1;
+            $takimlarDizisi2[$a]->atilangol += $dersler[$i][evSahibiGol];
+            $takimlarDizisi2[$a]->yenilengol += $dersler[$i][deplansmanGol];
+            $takimlarDizisi2[$a]->avaraj = $takimlarDizisi2[$a]->atilangol - $takimlarDizisi2[$a]->yenilengol;
+          }
+        }
+    }
+    else{
+      for($a = 0 ; $a < $takimDizisiCount; $a++){
+        if($takimlarDizisi2[$a]->takimId == $dersler[$i][evSahibiTakimId]){
+          $takimlarDizisi2[$a]->oynananmac += 1;
+          $takimlarDizisi2[$a]->beraberlik += 1;
+          $takimlarDizisi2[$a]->atilangol += $dersler[$i][evSahibiGol];
+          $takimlarDizisi2[$a]->yenilengol += $dersler[$i][deplansmanGol];
+          $takimlarDizisi2[$a]->avaraj = $takimlarDizisi2[$a]->atilangol - $takimlarDizisi2[$a]->yenilengol;
+          $takimlarDizisi2[$a]->puan += 1;
+        }
+        if($takimlarDizisi2[$a]->takimId == $dersler[$i][deplansmanTakimId]){
+          $takimlarDizisi2[$a]->oynananmac += 1;
+          $takimlarDizisi2[$a]->beraberlik += 1;
+          $takimlarDizisi2[$a]->atilangol += $dersler[$i][evSahibiGol];
+          $takimlarDizisi2[$a]->yenilengol += $dersler[$i][deplansmanGol];
+          $takimlarDizisi2[$a]->avaraj = $takimlarDizisi2[$a]->atilangol - $takimlarDizisi2[$a]->yenilengol;
+          $takimlarDizisi2[$a]->puan += 1;
+        }
+      }
+    }
+    $i++;
+  }
+}
+
 if($oncekiSezon){
     $evSahibiTakim =  $db->query("SELECT takim.takimAdi,mac.evSahibiTakimId,mac.evSahibiGol,takim.takimLogo  
                                   FROM takim,mac WHERE mac.evSahibiTakimId=takim.id AND mac.hafta='$hafta' AND mac.sezon=1819",PDO::FETCH_ASSOC)->fetchAll();
@@ -235,8 +312,9 @@ if($yeniSezon){
                 </div>
                     <?php } }else{ ?><h1 class="container text-center">Bulunamadı</h1> <?php } ?>
                     
-    <?php require('scoreTable2018.php'); ?>
+              <?php //require('scoreTable2018.php'); ?>
             </div>
+            
             <div class="col">
                 <h1 class="text-center"><?php echo $hafta ?>.HAFTA - Sezon 2019-2020</h1>
                 <?php if($yeniSezon){ for($i = 0; $i < count($yeniSezon);$i++){ ?>
@@ -269,11 +347,12 @@ if($yeniSezon){
                     </div> 
                 </div>
                     <?php } }else{ ?><h1 class="container text-center">Bulunamadı</h1> <?php } ?>
-
-                    <?php require('scoreTable.php'); ?>
+                    
+                    
             </div>
         </div>           
     </div>
+    <?php require('scoreTable2018.php'); ?>
     <link href="https://fonts.googleapis.com/css?family=Fjalla+One" rel="stylesheet"> 
 
   </body>
